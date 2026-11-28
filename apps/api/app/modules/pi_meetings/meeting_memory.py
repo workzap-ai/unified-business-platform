@@ -44,7 +44,19 @@ PROPER = re.compile(r"\b[A-Z][a-z]{2,}\b")
 NUMBER = re.compile(r"\d[\d,.]*")
 # what an earlier call may tell pi: only points a person on the team approved or edited (a draft is
 # a pi guess), and only these kinds; the newest calls first
-EARLIER_KINDS = ("summary", "problem", "requirement_explicit", "decision", "next_step")
+# (most useful first: what was left open, then what was settled, then the problem, then the recap)
+EARLIER_KINDS = (
+    "next_step",
+    "commitment",
+    "action",
+    "decision",
+    "problem",
+    "requirement_explicit",
+    "summary",
+)
+# what a person on the team still has to do or the customer was waiting for: pi may ask once
+# whether it happened; nothing else is a follow-up
+OPEN_KINDS = frozenset({"next_step", "commitment", "action"})
 EARLIER_CALLS = 3
 EARLIER_POINTS = 4
 EARLIER_CHARS = 170
@@ -53,6 +65,14 @@ COMMON = frozenset({"the", "and", "for", "they", "this", "that", "with", "have",
 
 def language_of(meeting: PiMeeting) -> str:
     return meeting.language if re.fullmatch(r"[a-z]{2,3}", meeting.language or "") else "en"
+
+
+def _point(item: PiMeetingInsight) -> str:
+    """One remembered point, e.g. "next_step: send the layout (by Friday)": a left-open item keeps
+    the date the team gave, so pi can tell whether it is due. Never the owner's name."""
+    text = redacted(item.edited_text or item.text, EARLIER_CHARS)
+    due = redacted(item.due_text, 40) if item.kind in OPEN_KINDS and item.due_text else ""
+    return f"{item.kind}: {text}" + (f" (by {due})" if due else "")
 
 
 async def earlier_calls(
@@ -86,10 +106,9 @@ async def earlier_calls(
             )
             .order_by(PiMeetingInsight.created_at)
         )
-        points = [
-            f"{item.kind}: {redacted(item.edited_text or item.text, EARLIER_CHARS)}"
-            for item in found.all()
-        ][:EARLIER_POINTS]
+        # the most useful kinds first (a stable sort keeps the order they were written in)
+        items = sorted(found.all(), key=lambda i: EARLIER_KINDS.index(i.kind))
+        points = [_point(item) for item in items][:EARLIER_POINTS]
         if points:
             out.append({"when": created.date().isoformat(), "points": points})
         if len(out) == EARLIER_CALLS:
