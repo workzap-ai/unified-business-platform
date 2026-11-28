@@ -19,7 +19,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from app.modules.pi.configuration import settings_row
-from app.modules.pi_meetings import media, native_stt
+from app.modules.pi_meetings import audio_clean, media, native_stt
 from app.modules.pi_meetings.models import PiMeeting, PiMeetingRoom
 from app.modules.pi_meetings.room_provider import RoomProvider, RoomProviderError
 
@@ -71,6 +71,7 @@ async def copy(
     duration_ms = (
         int((best.end - best.start).total_seconds() * 1000) if best.start and best.end else 0
     )
+    data = await audio_clean.clean(data)  # best effort: the original when it cannot be cleaned
     rules = (await settings_row(session, scope)).response_rules
     try:
         await media.save_part(
