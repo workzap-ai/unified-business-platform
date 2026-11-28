@@ -65,6 +65,7 @@ def validate_section(section: str, value: Any) -> None:
                 "meeting_room_live",
                 "meeting_room_copilot",
                 "meeting_room_present",
+                "meeting_room_record",
             }
             ensure(isinstance(brain, dict) and set(brain) <= {*TUNABLES, *flags})
             ensure(type(brain.get("learning_frozen", True)) is bool)
@@ -94,6 +95,7 @@ def validate_section(section: str, value: Any) -> None:
             ensure(type(brain.get("meeting_room_live", False)) is bool)  # live captions
             ensure(type(brain.get("meeting_room_copilot", False)) is bool)  # staff tips and notes
             ensure(type(brain.get("meeting_room_present", False)) is bool)  # pi presents slides
+            ensure(type(brain.get("meeting_room_record", False)) is bool)  # rooms may be recorded
             month = brain.get("meeting_room_month_minutes", 0)
             ensure(type(month) is int and 0 <= month <= 100_000)  # 0 = the built-in default
             ensure(

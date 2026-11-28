@@ -23,6 +23,8 @@ export const meetingJoinService = {
         room: z.boolean().catch(false),
         // in that room each voice is recorded briefly to write the transcript
         audio: z.boolean().catch(false),
+        // the host ticked "record the call": the whole call, video and audio, is kept for the team
+        recording: z.boolean().catch(false),
       }),
     ),
   join: (token: string, input: { name: string; consent: boolean }) =>

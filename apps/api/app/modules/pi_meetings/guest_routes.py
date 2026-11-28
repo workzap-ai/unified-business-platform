@@ -134,6 +134,22 @@ async def _room_records(session: AsyncSession, scope: WorkspaceScope, meeting: P
     return bool(found)
 
 
+async def _room_records_video(
+    session: AsyncSession, scope: WorkspaceScope, meeting: PiMeeting
+) -> bool:
+    """The host ticked "record the call": the page says so before anyone agrees to join."""
+    from app.modules.pi_meetings.models import PiMeetingRoom  # local: models import this module
+
+    found = await session.scalar(
+        select(PiMeetingRoom.record_video).where(
+            PiMeetingRoom.tenant_id == scope.tenant_id,
+            PiMeetingRoom.environment_id == scope.environment_id,
+            PiMeetingRoom.meeting_id == meeting.id,
+        )
+    )
+    return bool(found)
+
+
 async def voice_enabled(session: AsyncSession, scope: WorkspaceScope) -> bool:
     """pi may talk on links only when the workspace has switched on both links and voice."""
     brain = (await settings_row(session, scope)).response_rules.get("brain") or {}
@@ -387,6 +403,9 @@ async def look(token: Token, request: Request, session: Session) -> dict[str, An
         "room": meeting.source == "native",  # a video room: the page joins it instead of recording
         # in a room, each voice is recorded briefly to write the transcript: said before they agree
         "audio": meeting.source == "native" and await _room_records(session, scope, meeting),
+        # the whole call, video and audio, is recorded and kept for the host's team: said first
+        "recording": meeting.source == "native"
+        and await _room_records_video(session, scope, meeting),
     }
 
 

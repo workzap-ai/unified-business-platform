@@ -221,6 +221,15 @@ function RoomView() {
                   ? "Nothing was recorded."
                   : "pi is writing the transcript. This page updates by itself."}
             </p>
+            {room.record && room.state !== "failed" && (
+              <p className="text-sm text-muted-foreground">
+                {room.recording === "saved"
+                  ? "The recording is saved: open the meeting to watch it."
+                  : room.recording === "failed"
+                    ? "The recording could not be saved (no storage space or it was too large). The transcript is kept."
+                    : "The recording is being saved. It appears on the meeting page in a few minutes."}
+              </p>
+            )}
           </CardBody>
         </Card>
       ) : (

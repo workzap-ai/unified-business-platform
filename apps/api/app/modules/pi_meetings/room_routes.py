@@ -36,6 +36,7 @@ from app.modules.pi.memory_ledger import redacted
 from app.modules.pi_meetings import (
     agent_store,
     agents,
+    media,
     native_ingest,
     room_agent_claim,
     room_live,
@@ -95,6 +96,8 @@ class RoomInput(BaseModel):
     consent: bool = False
     # the agent for this meeting: a built-in key or a custom agent's id (None: pi itself)
     agent_key: str | None = Field(default=None, max_length=40)
+    # record the whole call (video and audio) for the team: guests are told on the join page
+    record_video: bool = False
 
 
 def provider_for(request: Request) -> RoomProvider | None:
@@ -123,6 +126,12 @@ async def audio_enabled(session: Any, scope: WorkspaceScope) -> bool:
     """Each voice is recorded briefly, to write the transcript with our own speech-to-text."""
     brain = (await settings_row(session, scope)).response_rules.get("brain") or {}
     return await room_enabled(session, scope) and brain.get("meeting_room_audio") is True
+
+
+async def record_enabled(session: Any, scope: WorkspaceScope) -> bool:
+    """Rooms of this workspace may be recorded (video and audio), when the host ticks it."""
+    brain = (await settings_row(session, scope)).response_rules.get("brain") or {}
+    return await room_enabled(session, scope) and brain.get("meeting_room_record") is True
 
 
 async def _require_room(session: Any, scope: WorkspaceScope) -> None:
@@ -167,6 +176,8 @@ def _view_room(room: PiMeetingRoom) -> dict[str, Any]:
         "state": room.state,
         "live": room.state in LIVE,
         "audio": room.audio,
+        "record": room.record_video,
+        "recording": room.recording_state,
         "present": room_present.summary(room.present),
         "transcript_state": room.transcript_state,
         "lines": room.lines,
@@ -237,7 +248,11 @@ async def room_options(scope: Scope, session: Session) -> dict[str, bool]:
     """What a new room will do in this workspace, so the page can tell people before they agree."""
     await _gate(session, scope, "pi.meetings.record")
     await _require_room(session, scope)
-    return {"audio": await audio_enabled(session, scope)}
+    # "record": the host may tick "record the call": the workspace allows it and has a bucket
+    return {
+        "audio": await audio_enabled(session, scope),
+        "record": await record_enabled(session, scope) and await media.has_bucket(session, scope),
+    }
 
 
 @router.post("/rooms", status_code=201)
@@ -271,6 +286,19 @@ async def open_room(
             409,
         )
     audio = await audio_enabled(session, scope)
+    if data.record_video:
+        if not await record_enabled(session, scope):
+            raise BusinessRuleViolation(
+                "MEETING_ROOM_RECORD_OFF",
+                "Recording video is not switched on for this workspace",
+                403,
+            )
+        if not await media.has_bucket(session, scope):
+            raise BusinessRuleViolation(
+                "MEETING_ROOM_RECORD_NEEDS_BUCKET",
+                "Connect a storage bucket in Settings first: a video recording needs one",
+                409,
+            )
     now = datetime.now(UTC)
     meeting = PiMeeting(
         tenant_id=scope.tenant_id,
@@ -282,11 +310,19 @@ async def open_room(
         agent_key=agent_key,
         consent_at=now,
         consent_by=scope.user_id,
+        # the host agrees to save a recording of the call; guests agree on the join page
+        media_consent_at=now if data.record_video else None,
+        media_consent_by=scope.user_id if data.record_video else None,
         consent_note=(
             "Host confirmed everyone in the room is told the call is transcribed and each voice "
             "is recorded briefly to write the transcript"
             if audio
             else "Host confirmed everyone in the room is told the call is transcribed"
+        )
+        + (
+            ", and that the whole call (video and audio) is recorded and kept for the team"
+            if data.record_video
+            else ""
         ),
         held_at=now,
         created_by=scope.user_id,
@@ -300,12 +336,18 @@ async def open_room(
         provider=provider.name,
         call_id=new_call_id(),
         audio=audio,
+        record_video=data.record_video,
+        recording_state="pending" if data.record_video else "none",
         created_by=scope.user_id,
     )
     session.add(room)
     await session.flush()
     try:
-        await provider.create_call(room.call_id, language=language, audio=audio)
+        if data.record_video:
+            await provider.create_call(room.call_id, language=language, audio=audio, record=True)
+            await provider.start_recording(room.call_id)
+        else:
+            await provider.create_call(room.call_id, language=language, audio=audio)
     except RoomProviderError as error:
         room.state = "failed"
         meeting.status = "failed"

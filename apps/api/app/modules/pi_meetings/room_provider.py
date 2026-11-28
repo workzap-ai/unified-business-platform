@@ -66,6 +66,10 @@ MAX_AUDIO_BYTES = 25 * 1024 * 1024  # what the speech-to-text services take in o
 # the biggest recording the worker will read into memory: a longer one is cut into pieces of at most
 # MAX_AUDIO_BYTES for transcription (`webm_split`); a bigger one still falls back to the captions
 MAX_DOWNLOAD_BYTES = 150 * 1024 * 1024
+# the biggest recording of a whole call that is copied (480p: about 4 MB a minute); a bigger one is
+# not copied and the call keeps only its transcript
+MAX_VIDEO_BYTES = 400 * 1024 * 1024
+RECORDING_QUALITY = "480p"  # sharp enough to read a shared screen, small enough to keep
 INDIVIDUAL_AUDIO = {"mode": "available", "output_types": ["audio_only"]}
 # individual_<call type>_<call id>_<user id>_<uuid>_audio_only_<time>.mkv
 _RECORDING_NAME = re.compile(
@@ -87,6 +91,15 @@ class RoomRecording:
     user_id: str  # the room user id: s_... or g_...
     url: str
     start: datetime | None
+
+
+@dataclass(frozen=True)
+class VideoRecording:
+    """The recording of the whole call (video and audio), once the provider has written it."""
+
+    url: str
+    start: datetime | None
+    end: datetime | None
 
 
 def _when(value: Any) -> datetime | None:
@@ -176,7 +189,9 @@ def trusted_transcript_url(url: str) -> bool:
 class RoomProvider(Protocol):
     name: str
 
-    async def create_call(self, call_id: str, *, language: str, audio: bool = False) -> None:
+    async def create_call(
+        self, call_id: str, *, language: str, audio: bool = False, record: bool = False
+    ) -> None:
         """Make the call (idempotent). Transcription starts by itself when people are in it; with
         `audio` each person's own voice is also recorded, to be transcribed by us and deleted."""
 
@@ -200,6 +215,15 @@ class RoomProvider(Protocol):
 
     async def recordings(self, call_id: str) -> list[RoomRecording]:
         """Each person's own audio file, once the provider has finished writing them."""
+
+    async def start_recording(self, call_id: str) -> None:
+        """Start recording the whole call (video and audio) now."""
+
+    async def video_recordings(self, call_id: str) -> list[VideoRecording]:
+        """The whole-call recordings the provider has finished writing."""
+
+    async def download_video(self, url: str) -> bytes | None:
+        """The bytes of a whole-call recording (None when missing or over `MAX_VIDEO_BYTES`)."""
 
     async def download(self, url: str) -> bytes | None:
         """The bytes of a recording (None when it is missing or too large to transcribe)."""
@@ -318,7 +342,9 @@ class StreamProvider:
             },
         )
 
-    async def create_call(self, call_id: str, *, language: str, audio: bool = False) -> None:
+    async def create_call(
+        self, call_id: str, *, language: str, audio: bool = False, record: bool = False
+    ) -> None:
         await self.ensure_call_type()
         data: dict[str, Any] = {"created_by": {"id": "pi_server", "name": "pi (AI)"}}
         override: dict[str, Any] = {}
@@ -327,6 +353,8 @@ class StreamProvider:
             override["transcription"] = {"language": spoken}
         if audio:
             override["individual_recording"] = {"mode": "auto-on", "output_types": ["audio_only"]}
+        if record:  # a recording of the whole call can be started for THIS call only
+            override["recording"] = {"mode": "available", "quality": RECORDING_QUALITY}
         if override:
             data["settings_override"] = override
         await self._call("POST", f"/video/call/{CALL_TYPE}/{call_id}", {"data": data})
@@ -426,6 +454,50 @@ class StreamProvider:
                 continue
             out.append(RoomRecording(found.group("user"), url, _when(item.get("start_time"))))
         return out
+
+    async def start_recording(self, call_id: str) -> None:
+        await self._call(
+            "POST", f"/video/call/{CALL_TYPE}/{call_id}/recordings/composite/start", {}
+        )
+
+    async def video_recordings(self, call_id: str) -> list[VideoRecording]:
+        listed = await self._call("GET", f"/video/call/{CALL_TYPE}/{call_id}/recordings")
+        items = listed.get("recordings") if isinstance(listed, dict) else None
+        out: list[VideoRecording] = []
+        for item in items if isinstance(items, list) else []:
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("filename") or "")
+            url = str(item.get("url") or "")
+            # a person's own audio (`individual_..._audio_only_...`) is not the call's recording
+            if name.startswith("individual_") or "audio_only" in name:
+                continue
+            if not url or not trusted_transcript_url(url):
+                continue
+            out.append(
+                VideoRecording(url, _when(item.get("start_time")), _when(item.get("end_time")))
+            )
+        return out
+
+    async def download_video(self, url: str) -> bytes | None:
+        if not trusted_transcript_url(url):
+            raise RoomProviderError("ROOM_RECORDING_UNTRUSTED", "That recording is not ours", 502)
+        chunks: list[bytes] = []
+        size = 0
+        try:
+            async with self._http.stream("GET", url, timeout=120.0) as reply:
+                if reply.status_code >= 400:
+                    return None
+                async for chunk in reply.aiter_bytes(1 << 20):
+                    size += len(chunk)
+                    if size > MAX_VIDEO_BYTES:
+                        return None  # too big to keep: stop reading at once
+                    chunks.append(chunk)
+        except httpx.HTTPError:
+            raise RoomProviderError(
+                "ROOM_PROVIDER_UNREACHABLE", "The video room service could not be reached"
+            ) from None
+        return b"".join(chunks)
 
     async def download(self, url: str) -> bytes | None:
         if not trusted_transcript_url(url):

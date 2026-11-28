@@ -45,11 +45,15 @@ class Provider:
         self.muted = []
         self.fail_mute = None
 
-    async def create_call(self, call_id, *, language, audio=False):
+    async def create_call(self, call_id, *, language, audio=False, record=False):
         if self.fail:
             raise self.fail
         self.created.append((call_id, language))
         self.audio = audio
+        self.record = record
+
+    async def start_recording(self, call_id):
+        self.recording_started = getattr(self, "recording_started", []) + [call_id]
 
     def user_token(self, user_id, call_id, *, ttl_s):
         self.tokens.append((user_id, call_id, ttl_s))
@@ -73,7 +77,7 @@ class Provider:
         return self.rows
 
     async def delete_call(self, call_id):
-        pass
+        self.deleted = getattr(self, "deleted", []) + [call_id]
 
 
 @pytest.fixture

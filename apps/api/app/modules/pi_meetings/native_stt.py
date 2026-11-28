@@ -244,12 +244,16 @@ async def _use_provider_transcript(
     except RoomProviderError:
         rows = None
     await native_ingest.finish_transcript(session, scope, meeting, room, rows or [])
-    await _forget_call(provider, room)
+    await forget_call(provider, room)
 
 
-async def _forget_call(provider: RoomProvider, room: PiMeetingRoom) -> None:
+async def forget_call(provider: RoomProvider, room: PiMeetingRoom) -> None:
     """The transcript lives with us from here: the call, its captions and any recording are removed
-    at the provider (best effort; an erase of the meeting removes it later if this fails)."""
+    at the provider (best effort; an erase of the meeting removes it later if this fails). A call
+    whose recording is still to be copied stays: removing the call removes its recording, and
+    the worker removes the call itself once the copy is made or given up."""
+    if room.record_video and room.recording_state == "pending":
+        return
     try:
         await provider.delete_call(room.call_id)
     except RoomProviderError:
@@ -320,7 +324,7 @@ async def finalize(
         spoken = await _in_roman_urdu(manager, scope, spoken)
         longest = await _rebuild(session, scope, meeting, spoken)
         await native_ingest.complete(session, scope, meeting, room, longest_ms=longest, now=now)
-        await _forget_call(provider, room)
+        await forget_call(provider, room)
         return "done"
     if age < GIVE_UP_S and room.stt_tries < MAX_TRIES:
         return "waiting"

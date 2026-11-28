@@ -154,8 +154,9 @@ function Companion() {
 
 /** Live timer, how many people are here, and what pi is doing right now. */
 function RoomBar() {
-  const { useParticipants } = useCallStateHooks();
+  const { useParticipants, useIsCallRecordingInProgress } = useCallStateHooks();
   const participants = useParticipants();
+  const recording = useIsCallRecordingInProgress();
   const pi = participants.find((p) => p.userId === PI_USER);
   const people = participants.filter((p) => p.userId !== PI_USER).length;
   const phase = usePiPhase();
@@ -182,6 +183,15 @@ function RoomBar() {
         />
         Live {clock}
       </span>
+      {recording && (
+        <span
+          role="status"
+          className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-2.5 py-1 font-semibold text-white"
+        >
+          <span aria-hidden className="size-2 rounded-full bg-white" /> REC:
+          this call is recorded
+        </span>
+      )}
       <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-muted px-2.5 py-1">
         <Users className="size-3.5" aria-hidden /> {people}{" "}
         {people === 1 ? "person" : "people"}

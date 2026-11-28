@@ -24,6 +24,9 @@ export const roomSchema = z.object({
   live: z.boolean().catch(false),
   // each voice is recorded briefly to write the transcript, then deleted
   audio: z.boolean().catch(false),
+  // the host ticked "record the call", and where the file is: none, pending, saved or failed
+  record: z.boolean().catch(false),
+  recording: z.enum(["none", "pending", "saved", "failed"]).catch("none"),
   // what pi is presenting in the room: the slide on show (the slides themselves stay on the server)
   present: z
     .object({
@@ -118,6 +121,8 @@ export const meetingRoomService = {
     consent: boolean;
     // which agent listens; left out means pi's own personality
     agent_key?: string;
+    // record the whole call (video and audio) for the team; guests are told on the join page
+    record_video?: boolean;
   }) =>
     apiRequest(
       "POST",
@@ -133,7 +138,10 @@ export const meetingRoomService = {
     apiRequest(
       "GET",
       `${BASE}/rooms/options`,
-      z.object({ audio: z.boolean().catch(false) }),
+      z.object({
+        audio: z.boolean().catch(false),
+        record: z.boolean().catch(false),
+      }),
     ),
   status: (meetingId: string) =>
     apiRequest(
@@ -266,6 +274,10 @@ export const ROOM_REFUSED: Record<string, string> = {
   MEETING_ROOM_STAFF: "Staff cannot be removed here. End the call instead.",
   MEETING_ROOM_PRESENT_OFF:
     "Presenting is not switched on for this workspace. Ask the platform owner.",
+  MEETING_ROOM_RECORD_OFF:
+    "Recording video is not switched on for this workspace. Ask the platform owner.",
+  MEETING_ROOM_RECORD_NEEDS_BUCKET:
+    "Connect a storage bucket in Settings first: a video recording needs one.",
   MEETING_ROOM_PI_OFF: "Turn pi's voice on first: pi has to be in the room.",
   MEETING_ROOM_NOTHING_TO_PRESENT:
     "There is nothing approved from earlier calls and nothing noted in this one yet.",

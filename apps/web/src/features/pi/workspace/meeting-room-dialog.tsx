@@ -53,12 +53,15 @@ export function StartRoomDialog({
     { enabled: open, retry: false },
   );
   const audio = options.data?.audio === true;
+  const canRecord = options.data?.record === true;
+  const [recordVideo, setRecordVideo] = useState(false);
   const make = useScopedMutation(meetingRoomService.open, {
     invalidate: [["pi", "meeting-intel"]],
     toastErrors: false,
     onSuccess: (out) => {
       setTitle("");
       setAgreed(false);
+      setRecordVideo(false);
       setLanguage("");
       setCustomer("");
       setAgentKey("pi");
@@ -163,6 +166,24 @@ export function StartRoomDialog({
                 : "Everyone who joins will be told that pi (an AI) is in the room and that the call is transcribed."}
             </span>
           </label>
+          {canRecord && (
+            <label className="flex items-start gap-2 text-sm">
+              <Checkbox
+                checked={recordVideo}
+                disabled={make.isPending}
+                onCheckedChange={(v) => setRecordVideo(v === true)}
+              />
+              <span>
+                <span className="font-medium">
+                  Record this call for my team.
+                </span>{" "}
+                The whole call, video and audio, is saved in your storage and
+                your team can watch it later. Everyone who joins is told first
+                and has to agree on the join page. Leave this unticked and no
+                video is ever recorded.
+              </span>
+            </label>
+          )}
           {failure && <Notice tone="danger">{failure}</Notice>}
         </DialogBody>
         <DialogFooter>
@@ -179,6 +200,7 @@ export function StartRoomDialog({
                 language,
                 customer_id: customer || null,
                 ...(agentKey !== "pi" ? { agent_key: agentKey } : {}),
+                ...(recordVideo && canRecord ? { record_video: true } : {}),
               })
             }
           >

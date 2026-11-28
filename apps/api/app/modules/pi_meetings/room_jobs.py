@@ -15,7 +15,7 @@ from sqlalchemy import select
 
 from app.ai.manager import build_llm_manager
 from app.modules.audit.service import record
-from app.modules.pi_meetings import auto_analyse, native_stt, room_watchdog
+from app.modules.pi_meetings import auto_analyse, native_stt, room_recording, room_watchdog
 from app.modules.pi_meetings import room_limits as limits
 from app.modules.pi_meetings.guest_routes import system_scope
 from app.modules.pi_meetings.models import PiMeeting, PiMeetingRoom
@@ -101,6 +101,57 @@ async def close_rooms(ctx: dict[str, Any]) -> int:
     return ended
 
 
+async def copy_recordings(ctx: dict[str, Any]) -> int:
+    """Copy the recording of each ended room whose host ticked "record the call" into the
+    workspace's storage (every half minute until it is there or given up). Returns how many were
+    saved. A failure of one room never stops the others."""
+    from app.modules.pi_meetings.retention import _worker_request
+
+    provider = build_provider(ctx["settings"], ctx["http"])
+    if provider is None:
+        return 0
+    saved = 0
+    now = datetime.now(UTC)
+    async with ctx["sessions"]() as session:
+        ids = await room_recording.waiting_rooms(session)
+    for room_id in ids:
+        try:
+            async with ctx["sessions"]() as session:
+                room = await session.get(PiMeetingRoom, room_id, with_for_update=True)
+                if (
+                    room is None
+                    or not room_recording.pending(room)
+                    or room.ended_at is None
+                    or (now - room.ended_at).total_seconds() < room_recording.WAIT_S
+                ):
+                    continue
+                scope = system_scope(room.tenant_id, room.environment_id)
+                meeting = await session.get(PiMeeting, room.meeting_id)
+                if meeting is None:
+                    continue
+                state = await room_recording.copy(
+                    session,
+                    scope,
+                    meeting,
+                    room,
+                    provider,
+                    _worker_request(ctx["settings"], ctx["http"]),
+                )
+                await record(
+                    session,
+                    "pi.meeting_room_recording",
+                    scope=scope,
+                    entity_type="pi_meeting",
+                    entity_id=meeting.id,
+                    details={"state": state, "tries": room.recording_tries},
+                )
+                await session.commit()
+                saved += state == "saved"
+        except Exception:  # noqa: BLE001 - one room must not stop the others
+            logger.warning("room_recording_copy_failed", extra={"room": str(room_id)})
+    return saved
+
+
 async def sweep_meeting_rooms(ctx: dict[str, Any]) -> None:
     """Close rooms past their limits, then recover rooms waiting for their transcript (also after a
     lost job)."""
@@ -109,6 +160,7 @@ async def sweep_meeting_rooms(ctx: dict[str, Any]) -> None:
         # tell staff when pi has dropped out of a call or a transcript is stuck (never raises)
         await room_watchdog.agent_missing(session)
         await room_watchdog.transcripts_stuck(session)
+    await copy_recordings(ctx)
     async with ctx["sessions"]() as session:
         ids = await native_stt.pending_rooms(session)
     for room_id in ids:

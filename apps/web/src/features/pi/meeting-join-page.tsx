@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { CheckCircle2, Lock, Mic, Square } from "lucide-react";
+import { CheckCircle2, Circle, Lock, Mic, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, Skeleton } from "@/components/ui/display";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/controls";
+import { Checkbox, Label } from "@/components/ui/controls";
 import { Notice } from "@/components/app/states";
 import { ApiError } from "@/services/api-client";
 import { meetingJoinService } from "./meeting-join-service";
@@ -88,6 +88,8 @@ export function MeetingJoinPage({ token }: { token: string }) {
   const [phase, setPhase] = useState<Phase>("ready");
   const [name, setName] = useState("");
   const [agreed, setAgreed] = useState(false);
+  // a recorded call: the person has read that it is recorded and agreed to join on those terms
+  const [recordingOk, setRecordingOk] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [sent, setSent] = useState(0);
   const [missed, setMissed] = useState(0);
@@ -311,7 +313,11 @@ export function MeetingJoinPage({ token }: { token: string }) {
               <p className="text-xs text-muted-foreground">You are joining</p>
               <h1 className="text-lg font-semibold">{look.data.title}</h1>
             </div>
-            <MeetingRoomGuest token={token} audio={look.data.audio} />
+            {look.data.recording && !recordingOk ? (
+              <RecordingNotice onAgree={() => setRecordingOk(true)} />
+            ) : (
+              <MeetingRoomGuest token={token} audio={look.data.audio} />
+            )}
           </CardBody>
         </Card>
       </Shell>
@@ -445,6 +451,36 @@ export function MeetingJoinPage({ token }: { token: string }) {
         </CardBody>
       </Card>
     </Shell>
+  );
+}
+
+/** Said before anything else in a call that is recorded: video and audio are kept for the host's
+ *  team. Nothing is asked of the camera or microphone until the person agrees. */
+function RecordingNotice({ onAgree }: { onAgree: () => void }) {
+  const [agreed, setAgreed] = useState(false);
+  return (
+    <div className="space-y-3" role="region" aria-label="This call is recorded">
+      <p className="flex items-center gap-2 text-sm font-semibold">
+        <Circle className="size-3 fill-red-500 text-red-500" aria-hidden /> This
+        call is recorded
+      </p>
+      <p className="text-sm text-muted-foreground">
+        The whole call, your video (if you turn your camera on), your voice and
+        any screen you share, is recorded and kept by the host&rsquo;s team so
+        they can watch it again. pi (an AI) is also in the call and writes a
+        transcript. If you do not agree, do not join.
+      </p>
+      <label className="flex items-start gap-2 text-sm">
+        <Checkbox
+          checked={agreed}
+          onCheckedChange={(v) => setAgreed(v === true)}
+        />
+        <span>I agree that this call is recorded.</span>
+      </label>
+      <Button className="w-full" disabled={!agreed} onClick={onAgree}>
+        Continue
+      </Button>
+    </div>
   );
 }
 

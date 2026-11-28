@@ -244,6 +244,11 @@ class PiMeetingRoom(WorkspaceRow):
     present: Mapped[dict[str, Any]] = mapped_column(
         JSONB, default=dict, server_default=text("'{}'::jsonb")
     )
+    # the host ticked "record the call" (everyone in it was told); the file follows: none, pending,
+    # saved or failed, and the copying is tried a bounded number of times (room_recording.py)
+    record_video: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
+    recording_state: Mapped[str] = mapped_column(String(8), default="none", server_default="none")
+    recording_tries: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
 
 
 class PiMeetingDocument(WorkspaceRow):

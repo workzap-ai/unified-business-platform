@@ -130,9 +130,9 @@ async def test_a_room_records_voices_only_when_the_workspace_switched_it_on_and_
 ):
     pi, mid, room = await ready(api, business_db, "369200001", audio=False)
     assert room.audio is False and provider.audio is False
-    assert (await api.get(f"{BASE}/rooms/options")).json() == {"audio": False}
+    assert (await api.get(f"{BASE}/rooms/options")).json() == {"audio": False, "record": False}
     await switch(api, audio=True, guests=True)
-    assert (await api.get(f"{BASE}/rooms/options")).json() == {"audio": True}
+    assert (await api.get(f"{BASE}/rooms/options")).json() == {"audio": True, "record": False}
     made = await open_room(api)
     mid2 = made.json()["meeting"]["id"]
     assert made.json()["room"]["audio"] is True and provider.audio is True
