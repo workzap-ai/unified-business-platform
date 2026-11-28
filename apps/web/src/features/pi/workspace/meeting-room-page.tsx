@@ -85,6 +85,11 @@ function RoomView() {
       meetingRoomService.removePerson(id, participantId),
     { invalidate: [key], toastErrors: false },
   );
+  const mute = useScopedMutation(
+    (input: { participantId: string; muted: boolean }) =>
+      meetingRoomService.mutePerson(id, input.participantId, input.muted),
+    { invalidate: [key], toastErrors: false },
+  );
   const setPi = useScopedMutation(
     (input: { mode?: "off" | "speak"; muted?: boolean; intake?: boolean }) =>
       meetingRoomService.setPi(id, input),
@@ -169,9 +174,17 @@ function RoomView() {
           </div>
         }
       />
-      {Boolean(enter.error || end.error || remove.error || setPi.error) && (
+      {Boolean(
+        enter.error || end.error || remove.error || mute.error || setPi.error,
+      ) && (
         <Notice tone="danger" className="mb-3">
-          {failure(enter.error ?? end.error ?? remove.error ?? setPi.error)}
+          {failure(
+            enter.error ??
+              end.error ??
+              remove.error ??
+              mute.error ??
+              setPi.error,
+          )}
         </Notice>
       )}
       {ended ? (
@@ -252,6 +265,10 @@ function RoomView() {
               minutes={status.data?.limits.minutes ?? 90}
               seats={status.data?.limits.people ?? 8}
               removing={remove.isPending}
+              muting={mute.isPending}
+              onMute={(participantId, muted) =>
+                mute.mutate({ participantId, muted })
+              }
               onRemove={(participantId) => {
                 if (
                   window.confirm(
@@ -354,12 +371,16 @@ function RoomPeople({
   minutes,
   seats,
   removing,
+  muting,
+  onMute,
   onRemove,
 }: {
   people: RoomPerson[];
   minutes: number;
   seats: number;
   removing: boolean;
+  muting: boolean;
+  onMute: (participantId: string, muted: boolean) => void;
   onRemove: (participantId: string) => void;
 }) {
   return (
@@ -381,17 +402,35 @@ function RoomPeople({
                   {p.label}
                   {p.staff ? " (staff)" : ""}
                   {p.removed ? " (removed)" : ""}
+                  {p.muted && !p.removed ? " (muted)" : ""}
                 </span>
                 {!p.staff && !p.removed && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    disabled={removing}
-                    aria-label={`Remove ${p.label} from the call`}
-                    onClick={() => onRemove(p.id)}
-                  >
-                    <UserMinus /> Remove
-                  </Button>
+                  <span className="flex shrink-0 items-center gap-1">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      disabled={muting}
+                      aria-pressed={p.muted}
+                      aria-label={
+                        p.muted
+                          ? `Let ${p.label} speak again`
+                          : `Mute ${p.label}`
+                      }
+                      onClick={() => onMute(p.id, !p.muted)}
+                    >
+                      {p.muted ? <MicOff /> : <Mic />}
+                      {p.muted ? "Unmute" : "Mute"}
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      disabled={removing}
+                      aria-label={`Remove ${p.label} from the call`}
+                      onClick={() => onRemove(p.id)}
+                    >
+                      <UserMinus /> Remove
+                    </Button>
+                  </span>
                 )}
               </li>
             ))}

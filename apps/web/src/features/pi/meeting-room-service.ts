@@ -38,6 +38,8 @@ export const roomPersonSchema = z.object({
   label: z.string().catch("Guest"),
   staff: z.boolean().catch(false),
   removed: z.boolean().catch(false),
+  // the host is holding this person muted
+  muted: z.boolean().catch(false),
 });
 export type RoomPerson = z.infer<typeof roomPersonSchema>;
 
@@ -98,6 +100,15 @@ export const meetingRoomService = {
       "POST",
       `${BASE}/${meetingId}/room/people/${participantId}/remove`,
       z.object({ removed: z.boolean() }),
+    ),
+  // Hold one guest muted (the microphone is switched off and they cannot switch it on again), or
+  // let them speak again.
+  mutePerson: (meetingId: string, participantId: string, muted: boolean) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${meetingId}/room/people/${participantId}/mute`,
+      z.object({ muted: z.boolean() }),
+      { body: { muted } },
     ),
   staffToken: (meetingId: string) =>
     apiRequest(
