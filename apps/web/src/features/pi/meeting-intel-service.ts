@@ -87,6 +87,27 @@ export const meetingSchema = z.object({
 });
 export type Meeting = z.infer<typeof meetingSchema>;
 
+export const chapterSchema = z.object({
+  start_line: z.number(),
+  start_ms: z.number().catch(0),
+  end_ms: z.number().catch(0),
+  title: z.string().catch(""),
+  summary: z.string().catch(""),
+});
+export const momentSchema = z.object({
+  kind: z.string().catch(""),
+  text: z.string().catch(""),
+  line: z.number(),
+  start_ms: z.number().catch(0),
+});
+export const chaptersSchema = z.object({
+  made_at: z.string().nullable().catch(null),
+  chapters: z.array(chapterSchema).catch([]),
+  moments: z.array(momentSchema).catch([]),
+  lines: z.number().catch(0),
+});
+export type Chapters = z.infer<typeof chaptersSchema>;
+
 export const insightSchema = z.object({
   id: z.string(),
   kind: z.enum(INSIGHT_KINDS).catch("summary"),
@@ -413,6 +434,14 @@ export const meetingIntelService = {
           .catch([]),
       }),
     ),
+  // Chapters pi made from the transcript, and the key moments (approved findings at their time).
+  chapters: (id: string) =>
+    apiRequest("GET", `${BASE}/${id}/chapters`, chaptersSchema),
+  // Makes (or remakes) the chapters: one model call, nothing is approved or sent.
+  makeChapters: (id: string) =>
+    apiRequest("POST", `${BASE}/${id}/chapters`, chaptersSchema, {
+      timeoutMs: 90_000,
+    }),
   // Live requirement mapping for one recorded part. Proposals only; best effort.
   analysePart: (id: string, index: number) =>
     apiRequest(

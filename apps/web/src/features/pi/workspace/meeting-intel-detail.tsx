@@ -54,6 +54,7 @@ import { MeetingPiMode } from "./meeting-pi-mode";
 import { MeetingDocuments } from "./meeting-documents";
 import { MeetingShareSummary } from "./meeting-share-summary";
 import { MeetingRecordingPlayer } from "./meeting-recording-player";
+import { MeetingChapters } from "./meeting-chapters";
 import {
   Accent,
   GroupHeading,
@@ -239,7 +240,12 @@ function Body({ meeting }: { meeting: Detail }) {
               hasTranscript={hasTranscript}
             />
           </TabsContent>
-          <TabsContent value="transcript" className="mt-4">
+          <TabsContent value="transcript" className="mt-4 space-y-4">
+            <MeetingChapters
+              id={meeting.id}
+              lines={meeting.segments_total}
+              canMake={canRecord && meeting.status !== "transcribing"}
+            />
             <Transcript
               key={`${meeting.id}-${meeting.segments_total}`}
               meeting={meeting}
@@ -691,7 +697,11 @@ function Transcript({ meeting }: { meeting: Detail }) {
           {segments.map((s) => {
             const name = s.speaker || "Speaker";
             return (
-              <li key={s.ordinal} className="flex gap-2.5">
+              <li
+                key={s.ordinal}
+                id={`line-${s.ordinal}`}
+                className="flex scroll-mt-4 gap-2.5"
+              >
                 <SpeakerAvatar name={name} index={order.indexOf(name)} />
                 <div className="min-w-0 flex-1">
                   <p className="text-xs">

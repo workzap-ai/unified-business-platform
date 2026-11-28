@@ -43,9 +43,17 @@ TRANSCRIPT_HOST = ".stream-io-cdn.com"  # the transcript is fetched only from th
 MAX_TRANSCRIPT_BYTES = 5_000_000
 STAFF_PREFIX = "s_"
 GUEST_PREFIX = "g_"
-# what any person in a room may do: be in it, hear and be heard. No one can end the call, mute
-# others or remove them from the browser: the host ends it through our API.
-USER_GRANTS = ["join-call", "read-call", "send-audio", "send-video", "screenshare"]
+# what any person in a room may do: be in it, hear and be heard, and raise a hand or react with an
+# emoji. No one can end the call, mute others or remove them from the browser: the host ends it
+# through our API.
+USER_GRANTS = [
+    "join-call",
+    "read-call",
+    "send-audio",
+    "send-video",
+    "screenshare",
+    "create-reaction",
+]
 AUDIO_PERMISSION = "send-audio"  # what a host takes away to hold a person muted
 
 
@@ -209,6 +217,14 @@ def build_provider(settings: Any, http: httpx.AsyncClient) -> "StreamProvider | 
     )
 
 
+def missing_grants(call_type: Any) -> bool:
+    """True when the call type lacks any grant a person in a room needs (a type made earlier)."""
+    grants = call_type.get("grants") if isinstance(call_type, dict) else None
+    if not isinstance(grants, dict):
+        return True
+    return any(set(USER_GRANTS) - set(grants.get(role) or []) for role in ("user", "admin"))
+
+
 class StreamProvider:
     name = "stream"
 
@@ -271,12 +287,14 @@ class StreamProvider:
             existing = await self._call("GET", f"/video/calltypes/{CALL_TYPE}")
             settings = existing.get("settings") if isinstance(existing, dict) else None
             single = settings.get("individual_recording") if isinstance(settings, dict) else None
+            update: dict[str, Any] = {}
             if not isinstance(single, dict) or single.get("mode") != "available":
-                await self._call(
-                    "PUT",
-                    f"/video/calltypes/{CALL_TYPE}",
-                    {"settings": {"individual_recording": INDIVIDUAL_AUDIO}},
-                )
+                update["settings"] = {"individual_recording": INDIVIDUAL_AUDIO}
+            if missing_grants(existing):
+                # a call type made before a grant was added gets it now (additive, our own type)
+                update["grants"] = {"user": USER_GRANTS, "admin": USER_GRANTS}
+            if update:
+                await self._call("PUT", f"/video/calltypes/{CALL_TYPE}", update)
             return
         except RoomProviderError as error:
             if error.code != "ROOM_PROVIDER_REFUSED":

@@ -140,6 +140,10 @@ class PiMeeting(WorkspaceRow):
     held_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     retention_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     attempts: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    # the chapters pi made from the transcript, with their times (see chapters.py)
+    chapters: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, default=dict, server_default=text("'{}'::jsonb")
+    )
     # which parts of the transcript the analysis has already read (analyse.py `run`), so a long
     # meeting on a rate-limited provider is finished over several calls, not lost on the first
     analysis_progress: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)

@@ -83,3 +83,39 @@ def test_a_gzipped_callback_is_signed_over_the_unzipped_bytes_and_cannot_balloon
     bomb = gzip.compress(b"0" * 100_000)
     assert len(bomb) < 1000 and rp.plain_body(bomb, 1000) is None
     assert rp.plain_body(b"x" * 2000, 1000) is None
+
+
+def test_a_room_user_may_react_and_an_older_call_type_is_brought_up_to_date():
+    assert "create-reaction" in rp.USER_GRANTS  # a raised hand and emoji reactions
+    assert not {"end-call", "mute-users", "block-users"} & set(rp.USER_GRANTS)
+    old = {"grants": {"user": ["join-call", "read-call"], "admin": list(rp.USER_GRANTS)}}
+    assert rp.missing_grants(old)
+    assert rp.missing_grants({})
+    assert not rp.missing_grants({"grants": {"user": rp.USER_GRANTS, "admin": rp.USER_GRANTS}})
+
+
+async def test_ensure_call_type_adds_the_missing_grant_once_and_leaves_a_current_type_alone():
+    import httpx
+
+    seen: list[tuple[str, str, dict]] = []
+    state = {"grants": {"user": ["join-call", "read-call", "send-audio"], "admin": ["join-call"]}}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        body = json.loads(request.content) if request.content else {}
+        seen.append((request.method, request.url.path, body))
+        if request.method == "GET":
+            return httpx.Response(
+                200,
+                json={**state, "settings": {"individual_recording": rp.INDIVIDUAL_AUDIO}},
+            )
+        state["grants"] = body.get("grants", state["grants"])
+        return httpx.Response(200, json={})
+
+    http = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    provider = rp.StreamProvider(http, "key", SECRET)
+    await provider.ensure_call_type()
+    puts = [s for s in seen if s[0] == "PUT"]
+    assert len(puts) == 1 and puts[0][2]["grants"]["user"] == rp.USER_GRANTS
+    assert "settings" not in puts[0][2]  # only what was missing
+    await provider.ensure_call_type()  # now current: no second write
+    assert len([s for s in seen if s[0] == "PUT"]) == 1

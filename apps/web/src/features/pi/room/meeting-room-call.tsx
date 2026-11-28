@@ -12,6 +12,7 @@ import {
   CallingState,
   CancelCallButton,
   OwnCapability,
+  ReactionsButton,
   SpeakerLayout,
   StreamCall,
   StreamTheme,
@@ -23,7 +24,7 @@ import {
   type Call,
   type StreamVideoParticipant,
 } from "@stream-io/video-react-sdk";
-import { Mic, MonitorOff, MonitorUp, Users, Video } from "lucide-react";
+import { Hand, Mic, MonitorOff, MonitorUp, Users, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/app/states";
 import type { RoomCredentials } from "../meeting-room-service";
@@ -158,6 +159,11 @@ function RoomBar() {
   const pi = participants.find((p) => p.userId === PI_USER);
   const people = participants.filter((p) => p.userId !== PI_USER).length;
   const phase = usePiPhase();
+  // who has a hand up (the video service shows a raised hand for a few seconds, and the tile
+  // shows it too; this keeps the name in the bar for the people who are not looking at the tile)
+  const hands = participants
+    .filter((p) => p.userId !== PI_USER && p.reaction?.type === "raise-hand")
+    .map((p) => p.name || "Someone");
   const [secs, setSecs] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setSecs((s) => s + 1), 1000);
@@ -180,6 +186,15 @@ function RoomBar() {
         <Users className="size-3.5" aria-hidden /> {people}{" "}
         {people === 1 ? "person" : "people"}
       </span>
+      {hands.length > 0 && (
+        <span
+          role="status"
+          className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1 font-medium text-amber-900"
+        >
+          <Hand className="size-3.5" aria-hidden /> {hands.join(", ")} raised a
+          hand
+        </span>
+      )}
       <span
         aria-live="polite"
         className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-medium ${
@@ -482,6 +497,9 @@ function Dock({
       </Control>
       <Control label="Camera">
         <ToggleVideoPublishingButton />
+      </Control>
+      <Control label="React">
+        <ReactionsButton />
       </Control>
       <Control label="Look">
         <BlurButton />

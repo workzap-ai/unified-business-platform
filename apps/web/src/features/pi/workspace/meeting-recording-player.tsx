@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/display";
@@ -24,6 +24,11 @@ export function MeetingRecordingPlayer({
 }) {
   const [open, setOpen] = useState(false);
   const [current, setCurrent] = useState(0);
+  const media = useRef<HTMLMediaElement | null>(null);
+  // a chapter or key moment was chosen: where to start playing, once the recording is open
+  const [jump, setJump] = useState<number | null>(null);
+  // each jump loads the media again, so the time is placed even in the part already playing
+  const [jumps, setJumps] = useState(0);
   const query = useScopedQuery(
     ["pi", "meeting-intel", id, "recording"],
     () => meetingIntelService.recording(id),
@@ -32,8 +37,35 @@ export function MeetingRecordingPlayer({
   const parts = query.data?.parts ?? [];
   const video = parts.filter((p) => p.kind === "video");
   const playlist = video.length > 0 ? video : parts;
-  const playing = playlist[Math.min(current, playlist.length - 1)];
+  // a chosen time wins over the part that was playing: the part that holds it (the last one that
+  // starts at or before it)
+  const holding =
+    jump === null
+      ? null
+      : playlist.reduce((best, p, i) => (p.offset_ms <= jump ? i : best), 0);
+  const index = Math.min(holding ?? current, Math.max(playlist.length - 1, 0));
+  const playing = playlist[index];
   const isVideo = playing?.kind === "video";
+
+  // "pi-meeting-seek" comes from the chapters list (a time on the meeting's clock, in ms)
+  useEffect(() => {
+    function onSeek(event: Event) {
+      const ms = (event as CustomEvent<{ ms: number }>).detail?.ms;
+      if (typeof ms !== "number") return;
+      setOpen(true);
+      setJump(ms);
+      setJumps((n) => n + 1);
+    }
+    window.addEventListener("pi-meeting-seek", onSeek);
+    return () => window.removeEventListener("pi-meeting-seek", onSeek);
+  }, []);
+  function placeAtJump() {
+    if (jump === null || !media.current || !playing) return;
+    media.current.currentTime = Math.max(0, (jump - playing.offset_ms) / 1000);
+    void media.current.play().catch(() => undefined);
+    setCurrent(index);
+    setJump(null);
+  }
 
   return (
     <Card>
@@ -70,7 +102,11 @@ export function MeetingRecordingPlayer({
         {playing &&
           (isVideo ? (
             <video
-              key={playing.url}
+              key={`${playing.url}:${jumps}`}
+              ref={(el) => {
+                media.current = el;
+              }}
+              onLoadedMetadata={placeAtJump}
               className="aspect-video w-full rounded-lg bg-black"
               src={playing.url}
               controls
@@ -81,7 +117,11 @@ export function MeetingRecordingPlayer({
             />
           ) : (
             <audio
-              key={playing.url}
+              key={`${playing.url}:${jumps}`}
+              ref={(el) => {
+                media.current = el;
+              }}
+              onLoadedMetadata={placeAtJump}
               className="w-full"
               src={playing.url}
               controls
