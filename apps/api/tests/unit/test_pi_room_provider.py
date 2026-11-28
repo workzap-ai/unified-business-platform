@@ -86,7 +86,8 @@ def test_a_gzipped_callback_is_signed_over_the_unzipped_bytes_and_cannot_balloon
 
 
 def test_a_room_user_may_react_and_an_older_call_type_is_brought_up_to_date():
-    assert "create-reaction" in rp.USER_GRANTS  # a raised hand and emoji reactions
+    assert "create-call-reaction" in rp.USER_GRANTS  # a raised hand and emoji reactions
+    assert "create-reaction" not in rp.USER_GRANTS  # the video service refuses it at call level
     assert not {"end-call", "mute-users", "block-users"} & set(rp.USER_GRANTS)
     old = {"grants": {"user": ["join-call", "read-call"], "admin": list(rp.USER_GRANTS)}}
     assert rp.missing_grants(old)

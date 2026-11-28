@@ -52,7 +52,7 @@ USER_GRANTS = [
     "send-audio",
     "send-video",
     "screenshare",
-    "create-reaction",
+    "create-call-reaction",  # a raised hand and emoji reactions (call level: not "create-reaction")
 ]
 AUDIO_PERMISSION = "send-audio"  # what a host takes away to hold a person muted
 
