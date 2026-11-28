@@ -345,7 +345,6 @@ async def open_room(
     try:
         if data.record_video:
             await provider.create_call(room.call_id, language=language, audio=audio, record=True)
-            await provider.start_recording(room.call_id)
         else:
             await provider.create_call(room.call_id, language=language, audio=audio)
     except RoomProviderError as error:

@@ -156,7 +156,7 @@ async def test_a_call_made_to_be_recorded_overrides_the_recording_setting_for_th
     posts = [s for s in sent if s[0] == "POST" and s[1].endswith(("/rabc", "/rdef"))]
     first, second = posts[0][2]["data"], posts[1][2]["data"]
     assert first["settings_override"]["recording"] == {
-        "mode": "available",
+        "mode": "auto-on",  # it starts with the call's session: it cannot be started at creation
         "quality": rp.RECORDING_QUALITY,
     }
     assert "recording" not in second.get("settings_override", {})  # an ordinary room: no change

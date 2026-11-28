@@ -90,7 +90,7 @@ async def test_the_host_ticks_it_and_guests_are_told_before_they_agree(
     mid = opened.json()["meeting"]["id"]
     assert opened.json()["room"]["record"] is True
     assert opened.json()["room"]["recording"] == "pending"
-    assert provider.record is True and provider.recording_started == [provider.created[-1][0]]
+    assert provider.record is True  # the call records by itself when its session starts
     room = await the_room(business_db, mid)
     meeting = await business_db.scalar(select(PiMeeting).where(PiMeeting.id == room.meeting_id))
     assert meeting.media_consent_at is not None and "video and audio" in meeting.consent_note
@@ -126,12 +126,10 @@ async def test_it_needs_the_flag_and_a_bucket_and_a_failed_start_opens_nothing(
 
     monkeypatch.setattr(media, "has_bucket", has_bucket)
 
-    async def broken(call_id):
-        raise RoomProviderError("ROOM_PROVIDER_BUSY", "busy", 429)
-
-    provider.start_recording = broken
+    provider.fail = RoomProviderError("ROOM_PROVIDER_REFUSED", "refused", 502)
     failed = await open_room(api, record_video=True)
-    assert failed.status_code == 429  # the host is told; a room that cannot record is not opened
+    assert failed.status_code == 502  # the host is told; a room that cannot be made is not opened
+    assert provider.recording_started == [] if hasattr(provider, "recording_started") else True
     await pi.close()
 
 

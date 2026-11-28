@@ -353,8 +353,10 @@ class StreamProvider:
             override["transcription"] = {"language": spoken}
         if audio:
             override["individual_recording"] = {"mode": "auto-on", "output_types": ["audio_only"]}
-        if record:  # a recording of the whole call can be started for THIS call only
-            override["recording"] = {"mode": "available", "quality": RECORDING_QUALITY}
+        if record:
+            # this call only: it records by itself as soon as its session starts (the first person
+            # joins). It cannot be started at creation: the service has no session to record yet
+            override["recording"] = {"mode": "auto-on", "quality": RECORDING_QUALITY}
         if override:
             data["settings_override"] = override
         await self._call("POST", f"/video/call/{CALL_TYPE}/{call_id}", {"data": data})
