@@ -171,6 +171,10 @@ async def test_openai_success(settings, scope, store):
         (httpx.ReadTimeout("slow"), "timeout"),
         (httpx.ConnectError("refused"), "connection"),
         (httpx.Response(404, json={"error": {"code": "model_not_found"}}), "model_unavailable"),
+        (
+            httpx.Response(413, json={"error": {"code": "rate_limit_exceeded", "type": "tokens"}}),
+            "request_too_large",
+        ),
     ],
 )
 async def test_openai_transient_failures_fall_back_to_gemini(settings, scope, failure, kind):
@@ -182,6 +186,19 @@ async def test_openai_transient_failures_fall_back_to_gemini(settings, scope, fa
         ("openai", "failed", kind, False),
         ("gemini", "success", None, True),
     ]
+
+
+async def test_a_provider_size_limit_does_not_open_its_circuit_or_stop_the_chain(settings, scope):
+    """Groq's free tier answers 413 above 8,000 tokens: that says nothing about its health (it
+    still takes small requests) and nothing about the request (a bigger window takes it)."""
+    too_large = httpx.Response(413, json={"error": {"code": "rate_limit_exceeded"}})
+    router = Router(openai=too_large, gemini=gemini_ok())
+    health = ProviderHealth(1, 30, clock=FakeClock())  # one real failure would open the circuit
+    manager = manager_for(configure(settings), router, health=health)
+    for _ in range(2):
+        response = await ask(manager, scope)
+        assert response.provider == "gemini"
+    assert router.providers == ["openai", "gemini", "openai", "gemini"]  # openai still tried
 
 
 async def test_gemini_5xx_falls_back_to_groq(settings, scope):

@@ -74,6 +74,10 @@ class OpenAICompatibleProvider(HttpAdapter):
         error = error_body(response)
         code = str(error.get("code") or error.get("type") or "")
         kind = classify_status(status)
+        if status == 413:
+            # A size limit of THIS provider or tier (Groq's free tier answers 413 above 8,000
+            # tokens a request), not a broken request: the next provider may take it.
+            kind = ErrorKind.REQUEST_TOO_LARGE
         if code in {"insufficient_quota", "billing_hard_limit_reached", "credit_balance_exhausted"}:
             kind = ErrorKind.QUOTA
         elif code in {"content_policy_violation", "content_filter"}:

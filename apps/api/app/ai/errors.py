@@ -25,6 +25,9 @@ class ErrorKind(StrEnum):
     MODEL_UNAVAILABLE = "model_unavailable"
     INVALID_OUTPUT = "invalid_output"
     UNSUPPORTED = "unsupported"
+    # This provider's own size limit (for example a free tier that takes 8,000 tokens a request):
+    # a provider with a larger window may take the same request, so the chain goes on.
+    REQUEST_TOO_LARGE = "request_too_large"
     # Permanent: the request or credentials are wrong; never cascade to other providers.
     AUTH = "auth"
     INVALID_REQUEST = "invalid_request"
@@ -42,6 +45,7 @@ TRANSIENT_KINDS = frozenset(
         ErrorKind.MODEL_UNAVAILABLE,
         ErrorKind.INVALID_OUTPUT,
         ErrorKind.UNSUPPORTED,
+        ErrorKind.REQUEST_TOO_LARGE,
     }
 )
 PERMANENT_KINDS = frozenset(
