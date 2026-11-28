@@ -115,6 +115,16 @@ def test_intake_also_starts_with_the_disclosure() -> None:
 
 
 def test_the_name_is_found_when_speech_to_text_spells_it_differently():
-    for spelled in ("Pie, can you hear me?", "hey Pai what do you think", "P.I., hello"):
+    for spelled in (
+        "Pie, can you hear me?",
+        "hey Pai what do you think",
+        "P.I., hello",
+        "Hello, Pai.",  # seen live: a comma after the greeting
+        "hello pait hello",
+        "Hi, pie. What can you do?",
+        "Hello, bye.",  # seen live: "Hello, pi" heard as "bye"
+    ):
         assert addressed(spelled)
+    for not_the_name in ("ok bye then", "bye", "I will buy it", "good bye everyone"):
+        assert not addressed(not_the_name)
     assert not addressed("I ate a piece of pizza")

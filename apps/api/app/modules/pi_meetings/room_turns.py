@@ -91,7 +91,13 @@ def _silent(reason: str) -> Decision:
 
 
 # how speech-to-text often spells the name; only trusted at the start or after a greeting
-SPELLED = re.compile(r"^\s*(?:(?:hey|hi|hello|ok|okay)\s+)?(?:pie|pye|pai)(?!\w)", re.IGNORECASE)
+SPELLED = re.compile(
+    r"^\s*(?:(?:hey|hi|hello)[\s,.!:-]+(?:bye|buy|pea)"
+    r"|(?:(?:hey|hi|hello|ok|okay)[\s,.!:-]+)?(?:pie|pye|pai|paai|pait))(?!\w)",
+    re.IGNORECASE,
+)
+# 'bye', 'buy' and 'pea' count only right after a greeting (found live: "Hello, pi" was written
+# "Hello, bye."); a bare "bye" or "ok bye" is a goodbye, not the name
 
 
 def addressed(text: str) -> bool:
