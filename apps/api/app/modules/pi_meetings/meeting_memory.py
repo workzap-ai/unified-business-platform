@@ -26,7 +26,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.pi import shared_memory
+from app.modules.pi import memory_rank, shared_memory
 from app.modules.pi.context_memory_types import OWNER_STATUSES
 from app.modules.pi.memory_ledger import redacted
 from app.modules.pi_meetings.models import PiMeeting, PiMeetingInsight
@@ -58,6 +58,7 @@ EARLIER_KINDS = (
 # whether it happened; nothing else is a follow-up
 OPEN_KINDS = frozenset({"next_step", "commitment", "action"})
 EARLIER_CALLS = 3
+LOAD_CAP = 3200  # characters of memory loaded per room, before each turn picks its share
 EARLIER_POINTS = 4
 EARLIER_CHARS = 170
 COMMON = frozenset({"the", "and", "for", "they", "this", "that", "with", "have", "last", "name"})
@@ -123,7 +124,11 @@ async def load(session: AsyncSession, scope: WorkspaceScope, meeting: PiMeeting)
         return {}
     try:
         block = await shared_memory.brief(
-            session, scope, meeting.customer_id, language=language_of(meeting)
+            session,
+            scope,
+            meeting.customer_id,
+            language=language_of(meeting),
+            cap=LOAD_CAP,  # wider than a chat's: each turn picks what fits for what was just said
         )
     except Exception:  # memory is context, never a reason for a turn to fail
         logger.warning("pi_meeting_memory_unavailable")
@@ -138,11 +143,15 @@ async def load(session: AsyncSession, scope: WorkspaceScope, meeting: PiMeeting)
     return block
 
 
-def speakable(block: dict[str, Any]) -> dict[str, Any]:
+def speakable(block: dict[str, Any], query: str = "") -> dict[str, Any]:
     """The part of the block pi may let shape what it SAYS: records the person said or confirmed,
     the ideas they said no to, and what the team approved from earlier calls. A pi guess, and the
     free-text summaries (which can blend guesses in), stay out. {} when nothing is left."""
     records = [r for r in block.get("records") or [] if r.get("status") in SAID]
+    # the records most useful for what was just said come first, and only what fits is kept
+    records = memory_rank.order(records, query)
+    while records and len(str(records)) > shared_memory.CAP_CHARS:
+        records.pop()
     earlier = block.get("earlier_calls") or []
     if not records and not earlier:
         return {}

@@ -706,7 +706,7 @@ async def reply_to(
     tired = annoyed(heard) or any(annoyed(t) for t in owner_lines)
     policy = question_policy(history, calm=tired)
     ctx["reply_language"] = {"roman_ur": "ur"}.get(lang, lang) if lang != "en" else ""
-    block = meeting_memory.speakable(what_i_know or {})
+    block = meeting_memory.speakable(what_i_know or {}, heard)
     seen = " ".join([*(h.text for h in history), heard])
     body: dict[str, Any] = {
         "reply_in": REPLY_IN.get(lang, "English"),
