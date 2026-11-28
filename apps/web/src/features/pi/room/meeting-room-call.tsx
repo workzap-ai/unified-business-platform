@@ -30,7 +30,13 @@ import { Notice } from "@/components/app/states";
 import type { RoomCredentials } from "../meeting-room-service";
 import { PiAvatar } from "./pi-avatar";
 import { toRomanUrdu } from "./roman-urdu";
-import { CopilotPanel, LiveCaptions, useRoomLive } from "./live-view";
+import {
+  CopilotPanel,
+  LiveCaptions,
+  useRoomLive,
+  type LiveState,
+} from "./live-view";
+import { PiFloat } from "./pi-float";
 import { BlurButton, NoiseButton, QualityProviders } from "./quality-controls";
 import {
   PiEye,
@@ -152,6 +158,18 @@ function Companion() {
   );
 }
 
+/** A raised hand: the video service's hand reaction (found live: its type is a plain "reaction"
+ *  and the hand is in its emoji code, so the room bar never showed who had a hand up). */
+function isRaisedHand(
+  reaction: { type?: string; emoji_code?: string } | undefined,
+): boolean {
+  return (
+    reaction?.type === "raise-hand" ||
+    reaction?.emoji_code === ":raise-hand:" ||
+    reaction?.emoji_code === ":raised_hand:"
+  );
+}
+
 /** Live timer, how many people are here, and what pi is doing right now. */
 function RoomBar() {
   const { useParticipants, useIsCallRecordingInProgress } = useCallStateHooks();
@@ -163,7 +181,7 @@ function RoomBar() {
   // who has a hand up (the video service shows a raised hand for a few seconds, and the tile
   // shows it too; this keeps the name in the bar for the people who are not looking at the tile)
   const hands = participants
-    .filter((p) => p.userId !== PI_USER && p.reaction?.type === "raise-hand")
+    .filter((p) => p.userId !== PI_USER && isRaisedHand(p.reaction))
     .map((p) => p.name || "Someone");
   const [secs, setSecs] = useState(0);
   useEffect(() => {
@@ -527,16 +545,73 @@ function Dock({
   );
 }
 
+/** What the floating window shows the person who is sharing: pi's face, what it is doing, and the
+ *  latest words. It is drawn here (inside the call) and shown there, so it has the call's state. */
+function PiFloatBody({ state }: { state: LiveState }) {
+  const { useParticipants } = useCallStateHooks();
+  const pi = useParticipants().find((p) => p.userId === PI_USER);
+  const agentKey = usePiAgent();
+  const phase = usePiPhase();
+  const voice = useVoiceShape(pi?.audioStream);
+  const speaking = pi?.isSpeaking ?? false;
+  const lines = state.lines.slice(-2);
+  return (
+    <div className="flex min-h-screen w-full flex-col items-center justify-center gap-3 bg-surface p-3 text-foreground">
+      {LIVE_AGENTS.has(agentKey) ? (
+        <SpriteAgent
+          agentKey={agentKey}
+          level={pi?.audioLevel ?? 0}
+          voice={voice}
+          speaking={speaking}
+          listening={!speaking}
+          screen="none"
+          size={150}
+          label="pi, an AI agent"
+          className="rounded-3xl"
+        />
+      ) : (
+        <PiAvatar expression={speaking ? "greet" : "rest"} size={96} />
+      )}
+      <PiPhaseBadge phase={speaking ? "speaking" : phase} />
+      <div
+        aria-live="polite"
+        className="w-full space-y-1 text-center text-sm leading-snug"
+      >
+        {lines.map((line) => (
+          <p key={line.n}>
+            <span className="font-medium">
+              {line.role === "pi" ? "pi" : line.name || "Speaker"}:{" "}
+            </span>
+            {line.text}
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /** Captions with translation (or the video service's own while the feature is off), and pi's
  *  private tips and notes for staff. One poll feeds both. */
 function LiveView() {
   const state = useRoomLive();
   return (
     <>
+      <PiFloat>
+        <PiFloatBody state={state} />
+      </PiFloat>
       <LiveCaptions state={state} fallback={<Captions />} />
       <CopilotPanel state={state} />
     </>
   );
+}
+
+/** What happens to the picture: said plainly, and true for a recorded call too (the video service
+ *  says when the recording is running). */
+function CallFootnote() {
+  const { useIsCallRecordingInProgress } = useCallStateHooks();
+  return useIsCallRecordingInProgress()
+    ? "This call is being recorded (video and audio) for the host's team."
+    : "Video is not recorded.";
 }
 
 export function MeetingRoomCall({
@@ -629,8 +704,7 @@ export function MeetingRoomCall({
               <Dock onLeave={() => leave()} onError={setError} />
               <p className="text-center text-xs text-muted-foreground">
                 pi (AI) is writing a transcript of this call. Your camera and
-                screen stay off until you turn them on, and video is never
-                recorded.
+                screen stay off until you turn them on. <CallFootnote />
               </p>
               <EndWatch onClosed={() => leave("ended")} />
             </div>

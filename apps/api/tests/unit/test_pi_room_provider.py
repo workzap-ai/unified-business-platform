@@ -218,3 +218,24 @@ async def test_a_video_is_read_in_pieces_and_a_too_big_one_stops_being_read():
         assert error.code == "ROOM_RECORDING_UNTRUSTED"
     else:
         raise AssertionError("only the provider's own CDN may ever be read")
+
+
+async def test_muting_a_person_says_who_mutes_and_holds_the_microphone_shut():
+    """Found live: without `muted_by_id` the video service answered 400 (Mute failed)."""
+    import httpx
+
+    sent: list[tuple[str, dict]] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        sent.append((request.url.path.rsplit("/", 1)[-1], json.loads(request.content)))
+        return httpx.Response(201, json={})
+
+    provider = _stream(handler)
+    await provider.mute_user("rabc", "g_1", True)
+    assert sent[0] == (
+        "mute_users",
+        {"user_ids": ["g_1"], "audio": True, "muted_by_id": rp.SERVER_USER},
+    )
+    assert sent[1] == ("user_permissions", {"user_id": "g_1", "revoke_permissions": ["send-audio"]})
+    await provider.mute_user("rabc", "g_1", False)
+    assert sent[2] == ("user_permissions", {"user_id": "g_1", "grant_permissions": ["send-audio"]})

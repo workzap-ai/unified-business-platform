@@ -54,6 +54,9 @@ USER_GRANTS = [
     "screenshare",
     "create-call-reaction",  # a raised hand and emoji reactions (call level: not "create-reaction")
 ]
+SERVER_USER = (
+    "pi_server"  # the user that made the calls (and the one that mutes on the host's behalf)
+)
 AUDIO_PERMISSION = "send-audio"  # what a host takes away to hold a person muted
 
 
@@ -397,7 +400,9 @@ class StreamProvider:
             await self._call(
                 "POST",
                 f"{base}/mute_users",
-                {"user_ids": [user_id], "audio": True},
+                # with the server's own key the service wants to know who is muting (found live:
+                # without it the answer was 400 and the host's Mute button failed)
+                {"user_ids": [user_id], "audio": True, "muted_by_id": SERVER_USER},
                 missing_ok=True,
             )
             await self._call(

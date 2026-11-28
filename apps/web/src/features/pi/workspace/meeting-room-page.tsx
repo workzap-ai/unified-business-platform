@@ -281,7 +281,12 @@ function RoomView() {
             </CardBody>
           </Card>
           <div className="space-y-4">
-            <MeetingInvite id={id} room audio={room.audio} />
+            <MeetingInvite
+              id={id}
+              room
+              audio={room.audio}
+              recorded={room.record}
+            />
             <PiSpeaks
               pi={room.pi}
               busy={setPi.isPending}

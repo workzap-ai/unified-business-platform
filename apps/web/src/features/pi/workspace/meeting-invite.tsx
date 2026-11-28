@@ -23,10 +23,13 @@ export function MeetingInvite({
   id,
   room = false,
   audio = false,
+  recorded = false,
 }: {
   id: string;
   room?: boolean;
   audio?: boolean;
+  // the host ticked "record this call": the whole call is kept, so the page must not say it is not
+  recorded?: boolean;
 }) {
   const [link, setLink] = useState("");
   const [copied, setCopied] = useState(false);
@@ -92,7 +95,7 @@ export function MeetingInvite({
           </h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
             {room
-              ? `Send a link and people join this video room from their browser. They agree that what they say is transcribed by pi (an AI) before they join, and they see nothing of the transcript. ${audio ? "Each voice is recorded briefly to write the transcript and is deleted afterwards; no video is saved." : "No video or audio is saved."} Only the words are kept, as text, and the transcript says who spoke.`
+              ? `Send a link and people join this video room from their browser. ${recorded ? "This call is recorded: video and audio are kept for your team, and each person is told and has to agree on the join page before they join. pi (an AI) also writes a transcript." : `They agree that what they say is transcribed by pi (an AI) before they join, and they see nothing of the transcript. ${audio ? "Each voice is recorded briefly to write the transcript and is deleted afterwards; no video is saved." : "No video or audio is saved."} Only the words are kept, as text, and the transcript says who spoke.`}`
               : "Send a link and each person records their own microphone into this meeting, so the transcript says who spoke. They agree before recording, see nothing of the transcript, and their sound is not kept."}
           </p>
         </div>
