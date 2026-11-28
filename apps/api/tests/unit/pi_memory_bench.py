@@ -221,6 +221,6 @@ if __name__ == "__main__":
             f"{'PASS' if new else 'FAIL'}  old={'pass' if old else 'FAIL'}  "
             f"{size:>4} chars  [{case.ability}] {case.name}"
         )
-    print(
-        f"\nranked: {sum(r[1] for r in rows)}/{len(rows)}   old order: {sum(r[2] for r in rows)}/{len(rows)}"
-    )
+    ranked_ok = sum(r[1] for r in rows)
+    old_ok = sum(r[2] for r in rows)
+    print(f"\nranked: {ranked_ok}/{len(rows)}   old order: {old_ok}/{len(rows)}")

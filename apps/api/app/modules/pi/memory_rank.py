@@ -32,7 +32,8 @@ from typing import Any
 WORD = re.compile(r"\w+", re.UNICODE)
 # words that say nothing about which record matters (English, plus common Roman Urdu glue words)
 STOP = frozenset(
-    "a an and are as at be been but by can did do does for from had has have he her his how i if in "
+    "a an and are as at be been but by can did do does for from had has have he her his how i if "
+    "in "
     "is it its me my of on or our she so that the their them they this to was we were what when "
     "where which who why will with you your about again also just not now than then there too very "
     "hai hain ka ki ke ko se mein me par pe aur ya kya kyun kyu kab kahan kaun ye yeh wo woh hum "
@@ -115,7 +116,7 @@ def order(records: Sequence[dict[str, Any]], query: str = "") -> list[dict[str, 
 
 
 def _recency(at: str, newest: str) -> float:
-    """1.0 for the newest date in the block, falling to 0 over a year; 0 when a record has no date."""
+    """1.0 for the newest date in the block, 0 after a year or for a record with no date."""
     if len(at) < 10 or len(newest) < 10:
         return 0.0
     try:

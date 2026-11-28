@@ -78,7 +78,7 @@ def from_context(
 ) -> dict[str, Any]:
     """The block from the memory the chat turn already built (`context["memory"]`): no query to the
     database. `query` is what the owner just said; the records most useful for it come first, so
-    the cap drops the least useful. Empty when there is no memory (a new customer, an erased one)."""
+    the cap drops the least useful. Empty when there is no memory (new or erased customer)."""
     memory = (context or {}).get("memory") or {}
     records = _compact(list(memory.get("known") or []), query)
     known = " ".join(str(memory.get("already_known") or "").split())[:400]
