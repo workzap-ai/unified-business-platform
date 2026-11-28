@@ -240,6 +240,10 @@ class PiMeetingRoom(WorkspaceRow):
     live: Mapped[dict[str, Any]] = mapped_column(
         JSONB, default=dict, server_default=text("'{}'::jsonb")
     )
+    # what pi is presenting in the room: its slides, the one on show and a version (room_present.py)
+    present: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, default=dict, server_default=text("'{}'::jsonb")
+    )
 
 
 class PiMeetingDocument(WorkspaceRow):

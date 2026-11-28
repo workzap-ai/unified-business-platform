@@ -33,7 +33,14 @@ from app.modules.access.dependencies import Scope, Session
 from app.modules.audit.service import record
 from app.modules.pi.configuration import settings_row
 from app.modules.pi.memory_ledger import redacted
-from app.modules.pi_meetings import agent_store, agents, native_ingest, room_agent_claim, room_live
+from app.modules.pi_meetings import (
+    agent_store,
+    agents,
+    native_ingest,
+    room_agent_claim,
+    room_live,
+    room_present,
+)
 from app.modules.pi_meetings import room_limits as limits
 from app.modules.pi_meetings.guest_routes import (
     GuestToken,
@@ -160,6 +167,7 @@ def _view_room(room: PiMeetingRoom) -> dict[str, Any]:
         "state": room.state,
         "live": room.state in LIVE,
         "audio": room.audio,
+        "present": room_present.summary(room.present),
         "transcript_state": room.transcript_state,
         "lines": room.lines,
         "started_at": room.started_at.isoformat() if room.started_at else None,
@@ -631,6 +639,7 @@ async def end_room(
     room.state = "ended"
     room.ended_at = room.ended_at or datetime.now(UTC)
     room.transcript_state = "pending"
+    room.present = room_present.stop(room.present)  # the slides are not kept after the call
     await record(
         session,
         "pi.meeting_room_ended",

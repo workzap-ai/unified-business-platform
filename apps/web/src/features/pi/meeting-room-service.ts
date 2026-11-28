@@ -10,6 +10,13 @@ import { apiRequest } from "@/services/api-client";
 
 const BASE = "/pi/meeting-intel";
 
+const presentSchema = z.object({
+  on: z.boolean().catch(false),
+  index: z.number().catch(0),
+  total: z.number().catch(0),
+  heading: z.string().catch(""),
+});
+
 export const roomSchema = z.object({
   id: z.string(),
   meeting_id: z.string(),
@@ -17,6 +24,15 @@ export const roomSchema = z.object({
   live: z.boolean().catch(false),
   // each voice is recorded briefly to write the transcript, then deleted
   audio: z.boolean().catch(false),
+  // what pi is presenting in the room: the slide on show (the slides themselves stay on the server)
+  present: z
+    .object({
+      on: z.boolean().catch(false),
+      index: z.number().catch(0),
+      total: z.number().catch(0),
+      heading: z.string().catch(""),
+    })
+    .catch({ on: false, index: 0, total: 0, heading: "" }),
   transcript_state: z.string().catch("none"),
   lines: z.number().catch(0),
   started_at: z.string().nullable().catch(null),
@@ -174,6 +190,28 @@ export const meetingRoomService = {
           liveViewSchema,
           { headers: { "X-Guest-Token": entry.token } },
         ),
+  // pi shows a recap in the room as its video: the team's approved points from earlier calls and
+  // the notes of this one. A person starts it, moves it and stops it.
+  startPresenting: (meetingId: string) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${meetingId}/room/present`,
+      z.object({ present: presentSchema }),
+      { body: {} },
+    ),
+  presentGo: (meetingId: string, move: { step?: number; index?: number }) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${meetingId}/room/present/go`,
+      z.object({ present: presentSchema }),
+      { body: move },
+    ),
+  stopPresenting: (meetingId: string) =>
+    apiRequest(
+      "POST",
+      `${BASE}/${meetingId}/room/present/stop`,
+      z.object({ present: presentSchema }),
+    ),
   // Staff keep one of pi's live notes: it becomes a DRAFT finding, reviewed like all the others.
   keepNote: (meetingId: string, note: number) =>
     apiRequest(
@@ -226,6 +264,12 @@ export const ROOM_REFUSED: Record<string, string> = {
   MEETING_ROOM_SPEAK_OFF:
     "pi speaking is not switched on for this workspace. Ask the platform owner.",
   MEETING_ROOM_STAFF: "Staff cannot be removed here. End the call instead.",
+  MEETING_ROOM_PRESENT_OFF:
+    "Presenting is not switched on for this workspace. Ask the platform owner.",
+  MEETING_ROOM_PI_OFF: "Turn pi's voice on first: pi has to be in the room.",
+  MEETING_ROOM_NOTHING_TO_PRESENT:
+    "There is nothing approved from earlier calls and nothing noted in this one yet.",
+  MEETING_ROOM_NOT_PRESENTING: "pi is not presenting right now.",
   MEETING_CONSENT_REQUIRED:
     "Confirm that everyone in the room will be told first.",
   ROOM_PROVIDER_KEY_REJECTED:

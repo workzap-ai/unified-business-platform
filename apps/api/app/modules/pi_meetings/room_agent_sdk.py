@@ -33,6 +33,7 @@ from app.modules.pi_meetings import (
     agent_voices,
     roman_urdu,
     room_live_wire,
+    room_present_agent,
     room_recall,
     room_sight,
     room_watchdog,
@@ -300,6 +301,8 @@ async def run_room(
         screen_tasks.add(task)
         task.add_done_callback(screen_tasks.discard)
 
+    presenter_box: dict[str, Any] = {"presenter": None}  # made once the agent is in the call
+
     async def beat_loop() -> None:
         unread_since: float | None = None
         beats = 0
@@ -325,6 +328,9 @@ async def run_room(
                 stop.set()
                 return
             run.apply(got)
+            presenter = presenter_box["presenter"]
+            if presenter is not None:  # a slide on show follows what the room says
+                await presenter.apply(got.present)
 
     async def tick_loop() -> None:
         """Ends turns by the clock when frames stop, and says how much audio is arriving."""
@@ -357,6 +363,8 @@ async def run_room(
             connection.on("call_ended", lambda *_: stop.set())
             connection.on("track_added", on_track)
             await connection.add_tracks(audio=track)
+            presenter_box["presenter"] = room_present_agent.Presenter(connection)
+            await presenter_box["presenter"].apply(orders.present)  # a restart mid-presentation
             for person in connection.participants_state.get_participants():
                 run.joined(_uid(person))
             beat_task = asyncio.create_task(beat_loop())
@@ -367,6 +375,9 @@ async def run_room(
         logger.exception("room_agent_failed")
     finally:
         stop.set()
+        if presenter_box["presenter"] is not None:
+            with contextlib.suppress(Exception):
+                await presenter_box["presenter"].stop()
         if feed is not None:  # the last translations and tips still in flight
             with contextlib.suppress(Exception):
                 await asyncio.wait_for(feed.settle(), 5)

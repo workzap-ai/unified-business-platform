@@ -56,6 +56,8 @@ class Orders:
     live: bool = False
     copilot: bool = False
     live_state: dict[str, Any] = field(default_factory=dict)
+    # what pi shows as its video right now ({} or {"on": False} when nothing): room_present.py
+    present: dict[str, Any] = field(default_factory=dict)
 
 
 def scope_of(room: PiMeetingRoom) -> WorkspaceScope:
@@ -67,6 +69,12 @@ async def live_flags(session: Any, scope: WorkspaceScope) -> tuple[bool, bool]:
     turns them on, and both need the rooms and pi's speech to be on as well."""
     brain = (await settings_row(session, scope)).response_rules.get("brain") or {}
     return (brain.get("meeting_room_live") is True, brain.get("meeting_room_copilot") is True)
+
+
+async def present_on(session: Any, scope: WorkspaceScope) -> bool:
+    """pi may present slides in this workspace's rooms (off until the workspace turns it on)."""
+    brain = (await settings_row(session, scope)).response_rules.get("brain") or {}
+    return bool(brain.get("meeting_room_present") is True)
 
 
 async def workspace_allows(session: Any, scope: WorkspaceScope) -> bool:
@@ -136,6 +144,7 @@ async def beat(session: Any, room_id: UUID, agent_id: str, now: datetime) -> Ord
     language, agent_key = (row[0] or "", row[1]) if row else ("", None)
     resolved_key, _, persona = await agent_store.resolve(session, scope, agent_key)
     live_on, copilot_on = await live_flags(session, scope) if allowed else (False, False)
+    presenting = allowed and await present_on(session, scope)
     return Orders(
         room_id=room.id,
         meeting_id=room.meeting_id,
@@ -157,6 +166,7 @@ async def beat(session: Any, room_id: UUID, agent_id: str, now: datetime) -> Ord
         live=live_on,
         copilot=copilot_on,
         live_state=dict(room.live or {}),
+        present=dict(room.present or {}) if presenting else {},
     )
 
 

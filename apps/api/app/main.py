@@ -80,6 +80,7 @@ from app.modules.pi_meetings.media_routes import router as pi_meeting_media_rout
 from app.modules.pi_meetings.pilot_routes import router as pi_meeting_pilot_router
 from app.modules.pi_meetings.qa_routes import router as pi_meeting_qa_router
 from app.modules.pi_meetings.recording_routes import router as pi_meeting_recording_router
+from app.modules.pi_meetings.room_present_routes import router as pi_meeting_present_router
 from app.modules.pi_meetings.room_routes import public_router as pi_meeting_room_public_router
 from app.modules.pi_meetings.room_routes import router as pi_meeting_room_router
 from app.modules.pi_meetings.room_routes import webhook_router as pi_meeting_room_webhook_router
@@ -165,6 +166,7 @@ ROUTERS = [
     pi_meeting_room_router,
     pi_meeting_documents_router,
     pi_meeting_chapters_router,
+    pi_meeting_present_router,
     pi_meeting_doc_send_router,
     pi_meeting_bot_webhook_router,
     pi_meeting_room_public_router,

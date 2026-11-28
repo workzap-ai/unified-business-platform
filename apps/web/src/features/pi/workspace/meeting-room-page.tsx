@@ -5,10 +5,13 @@ import Link from "next/link";
 import {
   ArrowLeft,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   DoorOpen,
   Mic,
   MicOff,
   PhoneOff,
+  Presentation,
   UserMinus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -88,6 +91,15 @@ function RoomView() {
   const mute = useScopedMutation(
     (input: { participantId: string; muted: boolean }) =>
       meetingRoomService.mutePerson(id, input.participantId, input.muted),
+    { invalidate: [key], toastErrors: false },
+  );
+  const present = useScopedMutation(
+    (input: { start: true } | { stop: true } | { step: number }) =>
+      "start" in input
+        ? meetingRoomService.startPresenting(id)
+        : "stop" in input
+          ? meetingRoomService.stopPresenting(id)
+          : meetingRoomService.presentGo(id, { step: input.step }),
     { invalidate: [key], toastErrors: false },
   );
   const setPi = useScopedMutation(
@@ -175,7 +187,12 @@ function RoomView() {
         }
       />
       {Boolean(
-        enter.error || end.error || remove.error || mute.error || setPi.error,
+        enter.error ||
+        end.error ||
+        remove.error ||
+        mute.error ||
+        present.error ||
+        setPi.error,
       ) && (
         <Notice tone="danger" className="mb-3">
           {failure(
@@ -183,6 +200,7 @@ function RoomView() {
               end.error ??
               remove.error ??
               mute.error ??
+              present.error ??
               setPi.error,
           )}
         </Notice>
@@ -260,6 +278,14 @@ function RoomView() {
               busy={setPi.isPending}
               onChange={(input) => setPi.mutate(input)}
             />
+            <PiPresents
+              present={room.present}
+              piHere={room.pi.here}
+              busy={present.isPending}
+              onStart={() => present.mutate({ start: true })}
+              onStep={(step) => present.mutate({ step })}
+              onStop={() => present.mutate({ stop: true })}
+            />
             <RoomPeople
               people={status.data?.people ?? []}
               minutes={status.data?.limits.minutes ?? 90}
@@ -282,6 +308,97 @@ function RoomView() {
         </div>
       )}
     </PageShell>
+  );
+}
+
+/** pi shows a recap in the room as its video. You start it, move it and stop it. */
+function PiPresents({
+  present,
+  piHere,
+  busy,
+  onStart,
+  onStep,
+  onStop,
+}: {
+  present: MeetingRoom["present"];
+  piHere: boolean;
+  busy: boolean;
+  onStart: () => void;
+  onStep: (step: number) => void;
+  onStop: () => void;
+}) {
+  return (
+    <Card>
+      <CardBody className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="flex items-center gap-2 text-sm font-medium">
+            <Presentation className="size-4" aria-hidden /> pi presents
+          </h2>
+          {present.on && (
+            <span
+              className="rounded-full bg-muted px-2 py-0.5 text-xs"
+              role="status"
+            >
+              Slide {present.index + 1} of {present.total}
+            </span>
+          )}
+        </div>
+        {present.on ? (
+          <>
+            <p className="text-sm">{present.heading}</p>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={busy || present.index === 0}
+                onClick={() => onStep(-1)}
+                aria-label="Previous slide"
+              >
+                <ChevronLeft /> Back
+              </Button>
+              <Button
+                size="sm"
+                disabled={busy || present.index >= present.total - 1}
+                onClick={() => onStep(1)}
+                aria-label="Next slide"
+              >
+                Next <ChevronRight />
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={busy}
+                onClick={onStop}
+              >
+                Stop presenting
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-xs text-muted-foreground">
+              pi shows a short recap as its own video: what your team approved
+              from this customer&rsquo;s earlier calls, and what was noted in
+              this call. Everyone in the room sees it. Check who is in the room
+              first.
+            </p>
+            <Button
+              size="sm"
+              variant="secondary"
+              disabled={busy || !piHere}
+              onClick={onStart}
+            >
+              <Presentation /> Show the recap
+            </Button>
+            {!piHere && (
+              <p className="text-xs text-muted-foreground">
+                Available once pi is in the room with its voice on.
+              </p>
+            )}
+          </>
+        )}
+      </CardBody>
+    </Card>
   );
 }
 

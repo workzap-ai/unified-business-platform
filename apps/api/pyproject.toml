@@ -68,5 +68,5 @@ ignore_missing_imports = true
 
 # the room agent's video SDK is a Linux-only native wheel, installed only in the agent image
 [[tool.mypy.overrides]]
-module = ["getstream.*", "getstream_rtc.*"]
+module = ["getstream.*", "getstream_rtc.*", "aiortc.*", "av.*"]
 ignore_missing_imports = true
